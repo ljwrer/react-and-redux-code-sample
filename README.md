@@ -32,6 +32,21 @@ componentWillMount可以用来生成日志
 
 componentDidMount不是紧跟render调用,要等到react更新DOM后
 componentDidMount用来ajax或调用第三方库
+```logs
+enter Parent render
+enter constructor: first child
+enter componentWillMount first child
+enter constructor: second child
+enter componentWillMount second child
+enter constructor: third child
+enter componentWillMount third child
+enter componentDidMount first child
+enter componentDidMount second child
+enter componentDidMount t
+
+
+
+```
 
 ### 2.3.2 更新过程
 
