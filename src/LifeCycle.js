@@ -15,10 +15,9 @@ class LifeCycle extends Component{
     componentWillReceiveProps(nextProps) {
         console.log('enter componentWillReceiveProps ' + this.props.caption)
     }
-    shouldComponentUpdate(){
-        console.log('enter shouldComponentUpdate ' + this.props.caption)
-        return true
-    }
+    // shouldComponentUpdate(){
+    //     console.log('enter shouldComponentUpdate ' + this.props.caption)
+    // }
     componentWillUpdate(){
         console.log('enter componentWillUpdate ' + this.props.caption)
     }
@@ -46,10 +45,10 @@ class Counter extends LifeCycle{
         );
     }
 
-    shouldComponentUpdate(nextProps,nextState){
-        super.shouldComponentUpdate.apply(this,arguments)
-        return nextState.count !== this.state.count
-    }
+    // shouldComponentUpdate(nextProps,nextState){
+        // super.shouldComponentUpdate.apply(this,arguments)
+        // return nextState.count !== this.state.count
+    // }
 
     add() {
         this.setState({
@@ -58,7 +57,7 @@ class Counter extends LifeCycle{
     }
 
 }
-class App extends LifeCycle{
+class LifeCycleApp extends LifeCycle{
     constructor(props){
         super(props)
         this.update = this.update.bind(this)
@@ -83,7 +82,9 @@ class App extends LifeCycle{
         this.forceUpdate()
     }
     toggle(){
-        this.state.hasSecond = !this.state.hasSecond
+        this.setState({
+            hasSecond: !this.state.hasSecond
+        })
     }
 }
-export default App
+export default LifeCycleApp

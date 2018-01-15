@@ -27,11 +27,11 @@ React使用事件委托处理事件,无论多少个onClick,最后都之添加一
 render应该是一个state和props的纯函数
 
 4.componentWillMount和componentDidMount
-componentWillMount修改状态不会引发重新绘制?
-componentWillMount可以用来生成日志
+componentWillMount修改状态不会引发重新绘制?如果要修改就去construct修改
+componentWillMount可以用来生成日志,服务端会调用
 
 componentDidMount不是紧跟render调用,要等到react更新DOM后
-componentDidMount用来ajax或调用第三方库
+componentDidMount用来ajax或调用第三方库,服务端不会调用
 
 Mount logs:
 ```
@@ -50,17 +50,31 @@ enter componentDidMount Parent
 ```
 
 ### 2.3.2 更新过程
-setState->shouldComponentUpdate-(true)-componentWillUpdate->render-componentDidUpdate
-Update logs:
+
+Parent Update logs:
 ```
+enter componentWillUpdate Parent
 enter render Parent
 enter componentWillReceiveProps first child
 enter shouldComponentUpdate first child
+enter componentWillUpdate first child
 enter render first child
 enter componentWillReceiveProps second child
 enter shouldComponentUpdate second child
+enter componentWillUpdate second child
 enter render second child
+enter componentDidUpdate first child
+enter componentDidUpdate second child
+enter componentDidUpdate Parent
 ```
+Child Update logs:
+```
+enter shouldComponentUpdate second child
+enter componentWillUpdate second child
+enter render second child
+enter componentDidUpdate second child
+```
+
 1.componentWillReceiveProps(nextProps)
 parent render->componentWillReceiveProps->shouldComponentUpdate-(true)-componentWillUpdate->render-componentDidUpdate
 当父组件render函数被调用时触发,并不是当prop变化时才被调用
@@ -68,7 +82,27 @@ parent render->componentWillReceiveProps->shouldComponentUpdate-(true)-component
 >不提倡在jsx中使用匿名函数,可能引发子组件不必要的重新渲染
 
 2.shouldComponentUpdate
+性能优化的关键,避免不必要的渲染
 3.componentWillUpdate,componentDidUpdate
-调用第三方库
+componentDidUpdate与componentDidMount类似,也在dom更新后执行
+用来调用第三方库调用第三方库,服务端会调用,但不应该调用
 
 ### 2.3.3 卸载过程
+UnMount logs:
+```
+enter componentWillUpdate Parent
+enter render Parent
+enter componentWillReceiveProps first child
+enter componentWillUpdate first child
+enter render first child
+enter componentWillUnmount second child
+enter componentDidUpdate first child
+enter componentDidUpdate Parent
+```
+移除非react创造的dom和事件
+
+## 2.4
+需要挂载在render的方法在construct中先bind
+
+## 2.5 prop和state局限
+耦合度高,使用全局状态作为唯一可靠的数据

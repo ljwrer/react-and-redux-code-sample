@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './LifeCycle';
+// import LifeCycle from './LifeCycle';
+import PropUsage from './PropUsage'
+// ReactDOM.render(<LifeCycle caption={'Parent'} />, document.getElementById('root'));
+ReactDOM.render(<PropUsage />, document.getElementById('PropUsage'));
 
-ReactDOM.render(<App caption={'Parent'} />, document.getElementById('root'));
