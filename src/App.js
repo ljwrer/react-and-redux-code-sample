@@ -1,33 +1,67 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
-const logHoc = function (WrappedComponent) {
-    return class extends Component {
-
-    }
+function getDisplayName(WrappedComponent) {
+    return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 }
-class Counter extends Component {
-    static defaultProps = {
-        caption: 'Parent'
+const LifecycleLog = function (WrappedComponent) {
+    class WithLifecycleLog extends Component {
+        static displayName = `WithLifecycleLog(${getDisplayName(WrappedComponent)})`
+        static defaultProps = {
+            caption: 'Parent'
+        }
+        constructor(props){
+            super(props)
+            console.log('enter constructor: ' + props.caption);
+        }
+
+        render(){
+            console.log(`enter ${this.props.caption} render`);
+            return (<WrappedComponent {...this.props} />)
+        }
+
+        componentDidMount() {
+            console.log('enter componentDidMount ' + this.props.caption);
+        }
+
+        componentWillMount() {
+            console.log('enter componentWillMount ' + this.props.caption);
+        }
+
+        componentWillReceiveProps(nextProps) {
+            console.log('enter componentWillReceiveProps ' + this.props.caption)
+        }
     }
+    return WithLifecycleLog
+}
+
+class Counter extends Component {
 
     static propTypes = {
         count: PropTypes.number,
         caption: PropTypes.string.isRequired
     }
 
+    static defaultProps = {
+        count: 0
+    }
+
+    constructor(props) {
+        super(props)
+        this.state = {count: this.props.count}
+        this.add = this.add.bind(this)
+    }
+
     render() {
         return (
             <div className="App">
                 <div>{this.state.count}</div>
-                <button onClick={this.add.bind(this)}>add</button>
+                <button onClick={this.add}>add</button>
             </div>
         );
     }
 
-    constructor(props) {
-        console.log('enter constructor: ' + props.caption);
-        super(props)
-        this.state = {count: this.props.count}
+    shouldComponentUpdate(nextProps,nextState){
+        return nextState.count !== this.state.count
     }
 
     add() {
@@ -35,48 +69,28 @@ class Counter extends Component {
             count: this.state.count + 1
         })
     }
-
-    componentDidMount() {
-        console.log('enter componentDidMount ' + this.props.caption);
-    }
-
-    componentWillMount() {
-        console.log('enter componentWillMount ' + this.props.caption);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        console.log('enter componentWillReceiveProps ' + this.props.caption)
-    }
-
 }
+const CounterWithLog = LifecycleLog(Counter)
 class App extends Component{
     constructor(props){
-        console.log('enter constructor: ' + props.caption);
         super(props)
+        this.update = this.update.bind(this)
     }
-    static defaultProps = {
-        count:0
+    static propTypes = {
+        caption: PropTypes.string.isRequired
     }
+
     render(){
-        console.log('enter Parent render');
         return (<div>
-            <Counter count={1} caption={'first child'} />
-            <Counter count={10} caption={'second child'} />
-            <Counter caption={'third child'} />
-            <button onClick={this.forceUpdate.bind(this)}>update</button>
+            <CounterWithLog count={1} caption={'first child'} />
+            <CounterWithLog count={10} caption={'second child'} />
+            <CounterWithLog caption={'third child'} />
+            <button onClick={this.update}>update</button>
         </div>)
     }
-    componentDidMount() {
-        console.log('enter componentDidMount ' + this.props.caption);
-    }
-
-    componentWillMount() {
-        console.log('enter componentWillMount ' + this.props.caption);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        console.log('enter componentWillReceiveProps ' + this.props.caption)
+    update(){
+        this.forceUpdate()
     }
 }
 
-export default App;
+export default LifecycleLog(App);
