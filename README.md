@@ -203,6 +203,14 @@ function reducer(state,action){
 store设计原则：避免冗余数据  
 使用扩展操作符简化代码
 
+与Flux差别
+	1. Actions只生成action而不派发
+	2. Dispatcher对象简化为store的dispatch函数
+	3. 注册reducer不再修改状态,而是返回新的状态
+	4. 全局唯一数据源
+	5. 统一的数据获取接口getState()
+	6. 统一的pub/sub接口
+
 ### 3.2.3 容器组件和傻瓜组件
 容器组件:负责和Redux Store交互
 傻瓜组件：无状态展示组件，只负责展示  
@@ -215,7 +223,7 @@ store设计原则：避免冗余数据
 一个应用只在一个地方导入store，其他地方通过context访问store
 
 #### context
-provide实现:
+provider实现:
  - getChildContext
  - static childContextTypes
 
@@ -226,3 +234,36 @@ provide实现:
  - 通过this.context调用store
 
 context类似全局变量 谨慎使用
+
+### 3.2.5 React-redux
+1. 提供connect连接容器组件和傻瓜组件
+2. 提供Provider提供store的context
+
+#### connect
+1. 把store上的状态转化为内层傻瓜组件的prop
+2. 把内层傻瓜组件的用户动作转化为派送的store动作
+
+```js
+const containerComponent = connect(mapStateToProps,mapDispatchToProps)(DumpComponent)
+const mapStateToProps = function(state, ownProps){
+	return {
+		// value from store
+		value:state[ownProps.tag] 	
+	}
+}
+const mapDispatchToProps = function(dispatch, ownProps){
+	return {
+		// dispatch action  	
+		onClick: ()=>{
+			dispatch(Actions.add(ownProps.tag))		
+		}	
+	}
+}
+```
+
+#### Provider
+提供统一的store访问接口，无需手动注入
+
+componentWillReceiveProps:检查代表store的prop是否一致
+
+
