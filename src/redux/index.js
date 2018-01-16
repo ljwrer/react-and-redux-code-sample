@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
-import {CounterStore} from "./CounterStore";
+import {store} from "./store";
 import * as Action from './Action'
-import {SummaryStore} from "./SummaryStore";
 class Counter extends Component{
     constructor(props){
         super(props)
-        this.state = {
-            count: CounterStore.getCounterValues()[props.caption]
-        }
+        this.state = this.getOwnState()
         this.onClickIncrement = this.onClickIncrement.bind(this)
         this.onClickDecrement = this.onClickDecrement.bind(this)
         this.onChange = this.onChange.bind(this)
@@ -21,54 +18,60 @@ class Counter extends Component{
         </div>)
     }
     onClickIncrement(){
-        Action.increment(this.props.caption)
+        store.dispatch(Action.increment(this.props.caption))
     }
     onClickDecrement(){
-        Action.decrement(this.props.caption)
+        store.dispatch(Action.decrement(this.props.caption))
     }
     onChange(){
-        this.setState({
-            count: CounterStore.getCounterValues()[this.props.caption]
-        })
+        this.setState(this.getOwnState())
+    }
+    getOwnState(){
+        return {
+            count: store.getState()[this.props.caption]
+        }
     }
     componentDidMount(){
-        CounterStore.addChangeListener(this.onChange)
+        store.subscribe(this.onChange)
     }
     componentWillUnmount(){
-        CounterStore.removeChangeListener(this.onChange)
-    }
-    shouldComponentUpdate(nextProps, nextState) {
-        return (nextProps.caption !== this.props.caption) ||
-            (nextState.count !== this.state.count);
+        store.unsubscribe(this.onChange)
     }
 }
 Counter.propTypes = {
     caption: PropTypes.string.isRequired
 }
+
 class Summary extends Component{
     constructor(props){
         super(props)
-        this.state = {
-            summary: SummaryStore.getSummary()
-        }
+        this.state = this.getOwnState()
         this.onSummaryChange = this.onSummaryChange.bind(this)
     }
     onSummaryChange(){
-        this.setState({
-            summary: SummaryStore.getSummary()
-        })
+        this.setState(this.getOwnState())
     }
     componentDidMount(){
-        CounterStore.addChangeListener(this.onSummaryChange)
+        store.subscribe(this.onSummaryChange)
     }
     componentWillUnmount(){
-        CounterStore.removeChangeListener(this.onSummaryChange)
+        store.unsubscribe(this.onSummaryChange)
     }
     render(){
         return (<div>Summary:{this.state.summary}</div>)
     }
+    getOwnState(){
+        const values = store.getState()
+        const summary = Object.keys(values).reduce((prev, key) => {
+            return prev + values[key]
+        }, 0)
+        return {
+            summary
+        }
+    }
 }
-export class FluxApp extends Component{
+
+export class ReduxApp extends Component{
     render(){
         return (<div>
             <Counter caption='First'/>

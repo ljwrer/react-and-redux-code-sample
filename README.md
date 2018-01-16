@@ -187,6 +187,8 @@ function reducer(state,action){
 		 - @param initValues
 		 - @param store Enhancer
 		 - @return store
+	 - getState
+		 - @return storeState
  - Reducer
 	 - pureFunc
 	 - @param state
@@ -196,6 +198,31 @@ function reducer(state,action){
 	 - 实现接口处理store.getState()提供的数据
 	 - 通过Actions生成action,然后通过store.dispatch(action)派发action
 	 - 订阅store同步数据
+		 - construct或mount时调用
 
 store设计原则：避免冗余数据  
 使用扩展操作符简化代码
+
+### 3.2.3 容器组件和傻瓜组件
+容器组件:负责和Redux Store交互
+傻瓜组件：无状态展示组件，只负责展示  
+
+容器组件通过prop传递状态给傻瓜组件
+
+分离出的容器组件有类似的逻辑
+
+### 3.2.4 组件context
+一个应用只在一个地方导入store，其他地方通过context访问store
+
+#### context
+provide实现:
+ - getChildContext
+ - static childContextTypes
+
+需要context的组件实现
+ - constructor
+	 - super(props,context)
+ - static contextTypes
+ - 通过this.context调用store
+
+context类似全局变量 谨慎使用
