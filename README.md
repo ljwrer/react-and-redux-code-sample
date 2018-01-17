@@ -266,4 +266,104 @@ const mapDispatchToProps = function(dispatch, ownProps){
 
 componentWillReceiveProps:检查代表store的prop是否一致
 
+# 4. 模块化
+### 4.2.2 按功能组织
+```
 
+│  index.js
+│  Store.js
+│
+├─filter
+│  │  actions.js
+│  │  actionTypes.js
+│  │  filterType.js
+│  │  index.js
+│  │  reducers.js
+│  │
+│  └─view
+│          Filter.js
+│          Link.js
+│
+└─todos
+    │  actions.js
+    │  actionTypes.js
+    │  index.js
+    │  reducers.js
+    │
+    └─view
+            TodoAdd.js
+            TodoItem.js
+            TodoList.js
+```
+统一模块导出接口
+```js
+import view from './view/TodoList'
+import reducers from './reducers'
+import * as actions from './actions'
+export {
+    view,
+    reducers,
+    actions
+}
+```
+
+## 4.4 状态树的设计
+ - 一个模块控制一个状态节点
+	 - 拥有修改权
+ - 避免冗余数据
+	 - reselect提升性能
+ - 树形结构扁平
+
+### 4.5.1 状态设计
+避免用数字取代枚举类型，应该使用具体的字符串或Symbol，方便调试
+
+### 4.5.2 action
+action type需要共同的前缀提供命名空间
+
+### 4.5.3 组合
+combineReducers会将state对象拆分交给指定的reducer处理，处理完后会合并
+
+mapStateToProps能拿到完整的state
+```
+const store = createStore(combineReducers({
+    todos:todosReducers,
+    filter:filterReducers
+}))
+```
+
+### 4.5.4 视图
+#### ref
+将dom绑定到组件
+
+ - @type func
+	- @parma node
+
+```
+refInput(node){
+	this.input = node
+}
+```
+谨慎使用ref,不应该让ref跨越组件边界
+
+#### jsx
+jsx能插入表达式,但是不能插入语句
+
+#### bindActionCreators
+参数一致时简化代码
+```
+const mapDispatcherToProps = dispatch => (
+    bindActionCreators({
+        onRemove: deleteTodo,
+        onToggle: toggleTodo
+    },dispatch)
+)
+```
+```
+const mapDispatcherToProps = {
+    onRemove: deleteTodo,
+    onToggle: toggleTodo
+}
+```
+
+### 4.5.6 不使用ref
+监听change事件并使用state保存表单状态
