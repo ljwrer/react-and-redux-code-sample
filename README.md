@@ -237,7 +237,10 @@ context类似全局变量 谨慎使用
 
 ### 3.2.5 React-redux
 1. 提供connect连接容器组件和傻瓜组件
+	- 自动订阅store
 2. 提供Provider提供store的context
+	- 自动实现context
+	- props自动传递
 
 #### connect
 1. 把store上的状态转化为内层傻瓜组件的prop
@@ -372,7 +375,7 @@ const mapDispatcherToProps = {
  - react devtools
  - redux devtools
  - react perf(过期)
- - redux-immutable-state-invariant
+ - redux-immutable-state-invariant+++++++++++++++++++++++++++++++++++++++
 	 - 监控state修改
 	 - dev only
 
@@ -395,3 +398,25 @@ if(process.env.NODE_ENV!=='production'){
 const storeEnhancers = composeEnhancers(applyMiddleware(...middlewares))
 const store = createStore(reducer,{},storeEnhancers)
 ```
+
+# 5. 组件性能优化
+## 5.1 单组件优化
+### 5.1.1 渲染时间
+优化计算virtual dom的时间,防止不必要的render调用
+
+### 5.1.3 react-redux shouldComponentUpdate
+默认shouldComponentUpdate返回true
+
+react-redux connect生成的容器组件定制了shouldComponentUpdate，自动比较props
+> === 全等比较（shallow compare）
+
+即使傻瓜组件不从store获取数据也可以自动创建shouldComponentUpdate
+```
+connect()(SomeDumpComponent)
+```
+
+1. 注意props传递的对象尽量保持不变
+	- 在render中新建的对象，包括匿名函数，对象字面量(如style)等每次都与上次的不全等
+2. 底层的组件尽量通过mapDispatchToProps处理事件，而不是通过父组件传递回掉函数处理,达到高内聚的目的
+
+## 5.2 多个react组件的性能优化

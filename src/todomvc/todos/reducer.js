@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import {TODO_ADD, TODO_DELETE, TODO_TOGGLE} from "./actionTypes";
 export default function (state=[], action) {
-    console.log(state)
     const {type, id} = action
     switch(type){
         case TODO_ADD:
@@ -18,6 +17,7 @@ export default function (state=[], action) {
                 }
                 return todo
             })
+
         default:
             return state
     }

@@ -1,21 +1,31 @@
-import React from 'react';
+import React,{Component} from 'react';
 import PropTypes from 'prop-types'
 import {switchFilter} from "../actions";
 import {connect} from "react-redux";
-const Link = function ({active,children,onClick}) {
-    if(active){
-        return <b className="filter__selected">{children}</b>
-    }else {
-        return (<a href="#1" className="filter__no-selected" onClick={(event)=>{
-            event.preventDefault()
-            onClick()
-        }}>{children}</a>)
+
+class Link extends Component{
+    constructor(props){
+        super(props)
+        this.onClick = this.onClick.bind(this)
+    }
+    render(){
+        const {active,children} = this.props
+        if(active){
+            return <b className="filter__selected">{children}</b>
+        }else {
+            return (<a href="#1" className="filter__no-selected" onClick={this.onClick}>{children}</a>)
+        }
+    }
+    onClick(event){
+        event.preventDefault()
+        this.props.onClick()
     }
 }
 Link.propTypes = {
     onClick:PropTypes.func.isRequired,
     children:PropTypes.node.isRequired,
-    active:PropTypes.bool.isRequired
+    active:PropTypes.bool.isRequired,
+    status:PropTypes.string.isRequired
 }
 const mapStateToProps = function (state,ownProps) {
     return {
