@@ -278,7 +278,7 @@ componentWillReceiveProps:检查代表store的prop是否一致
 │  │  actionTypes.js
 │  │  filterType.js
 │  │  index.js
-│  │  reducers.js
+│  │  reducer.js
 │  │
 │  └─view
 │          Filter.js
@@ -288,7 +288,7 @@ componentWillReceiveProps:检查代表store的prop是否一致
     │  actions.js
     │  actionTypes.js
     │  index.js
-    │  reducers.js
+    │  reducer.js
     │
     └─view
             TodoAdd.js
@@ -298,11 +298,11 @@ componentWillReceiveProps:检查代表store的prop是否一致
 统一模块导出接口
 ```js
 import view from './view/TodoList'
-import reducers from './reducers'
+import reducer from './reducer'
 import * as actions from './actions'
 export {
     view,
-    reducers,
+    reducer,
     actions
 }
 ```
@@ -367,3 +367,31 @@ const mapDispatcherToProps = {
 
 ### 4.5.6 不使用ref
 监听change事件并使用state保存表单状态
+
+## 4.6 devtool
+ - react devtools
+ - redux devtools
+ - react perf(过期)
+ - redux-immutable-state-invariant
+	 - 监控state修改
+	 - dev only
+
+#### compose,applyMiddleware
+ - compose
+	 - 组合多个store Enhance
+ - applyMiddleware
+	 - 组合多个middleware
+
+```js
+const win = window
+const middlewares = []
+let composeEnhancers = compose
+if(win && win.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__){
+    composeEnhancers =  win.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+}
+if(process.env.NODE_ENV!=='production'){
+    middlewares.push(require('redux-immutable-state-invariant').default())
+}
+const storeEnhancers = composeEnhancers(applyMiddleware(...middlewares))
+const store = createStore(reducer,{},storeEnhancers)
+```

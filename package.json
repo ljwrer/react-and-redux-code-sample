@@ -18,6 +18,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "prop-types": "^15.6.0"
+    "prop-types": "^15.6.0",
+    "redux-immutable-state-invariant": "^2.1.0"
   }
 }

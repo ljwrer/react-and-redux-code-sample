@@ -1,8 +1,8 @@
 import view from './view/TodoList'
-import reducers from './reducers'
+import reducer from './reducer'
 import * as actions from './actions'
 export {
     view,
-    reducers,
+    reducer,
     actions
 }

@@ -1,8 +1,19 @@
-import {createStore,combineReducers} from 'redux'
-import {reducers as filterReducers} from './filter'
-import {reducers as todosReducers} from './todos'
-const store = createStore(combineReducers({
+import {createStore,combineReducers,applyMiddleware,compose} from 'redux'
+import {reducer as filterReducers} from './filter'
+import {reducer as todosReducers} from './todos'
+const reducer = combineReducers({
     todos:todosReducers,
     filter:filterReducers
-}))
+})
+const win = window
+const middlewares = []
+let composeEnhancers = compose
+if(win && win.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__){
+    composeEnhancers =  win.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+}
+if(process.env.NODE_ENV!=='production'){
+    middlewares.push(require('redux-immutable-state-invariant').default())
+}
+const storeEnhancers = composeEnhancers(applyMiddleware(...middlewares))
+const store = createStore(reducer,{},storeEnhancers)
 export default store
