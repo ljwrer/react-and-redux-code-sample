@@ -375,7 +375,7 @@ const mapDispatcherToProps = {
  - react devtools
  - redux devtools
  - react perf(过期)
- - redux-immutable-state-invariant+++++++++++++++++++++++++++++++++++++++
+ - redux-immutable-state-invariant
 	 - 监控state修改
 	 - dev only
 
@@ -420,3 +420,91 @@ connect()(SomeDumpComponent)
 2. 底层的组件尽量通过mapDispatchToProps处理事件，而不是通过父组件传递回掉函数处理,达到高内聚的目的
 
 ## 5.2 多个react组件的性能优化
+关注更新过程
+
+### 5.2.1 React调和
+局部更新
+UI -> render -> virtual DOM -> Reconciliation
+
+>diff树时间复杂度为O(N<sup>3</sup>)
+
+React diff树时间复杂度为O(N)，为了性能而妥协
+
+#### diff过程
+I.比较根节点类型是否相同:
+1.节点类型不同
+卸载原来的组件 componentWillUnmount—>componentWillMount->render->componentDidMount
+>提供稳定的根节点
+
+2.节点类型相同
+DOM元素:保留DOM元素,对比根节点属性和类型,更新修改的部分(如className,style)
+React组件:props update -> componentWillReceiveProps -> shouldComponentUpdate -> componentWillUpdate->render->componentDidUpdate
+>重视shouldComponentUpdate
+
+然后递归处理节点
+
+3.多个子组件的情况
+>diff数组时间复杂度为O(N<sup>2</sup>)
+
+React diff树时间复杂度为O(N)，为了性能而妥协,直接挨个比较
+![](https://res.infoq.com/articles/react-dom-diff/zh/resources/0909005.png)
+
+### 5.2.2 key
+通过key避免挨个比较，避免重复渲染
+![](https://res.infoq.com/articles/react-dom-diff/zh/resources/0909006.png)
+
+key和ref是react保留的特殊属性，不能读取
+
+提供稳定不变的key
+
+使用Array index作为key没有任何意义,如果数组元素位置替换,将造成数组中大量组件更新
+
+## 5.3 reselect
+memorize(高阶函数闭包缓存计算结果)加速mapStateToProps
+
+### 5.3.1 选择过程
+1. 对比依赖的字段有无变化
+2. 没有变化则直接从缓存读取
+
+reselect -> selector
+
+selector:(pure)
+ - @param state
+ - @return mapStateToProps param
+
+#### reselect
+1. 抽取state做shallow compare决定是否使用缓存结果
+2. 取第一层结果计算返回最终的结果
+
+```
+const getFilter = state => state.filter
+const getTodos = state => state.todos
+const getShowList = createSelector([getTodos, getFilter],function (todos,filter) {
+    switch (filter){
+        case filterType.all:
+            return todos
+        case filterType.completed:
+            return todos.filter(todo=>todo.completed)
+        case filterType.unCompleted:
+            return todos.filter(todo=>!todo.completed)
+        default:
+            throw new Error('unsupported filter type')
+    }
+})
+
+const mapStateToProps = function (state) {
+    return {
+        todos:getShowList(state)
+    }
+}
+```
+
+### 5.3.2 范式化状态数
+保持状态数扁平
+
+遵循关系型数据库设计原则
+
+降低修改难度
+
+提高读取难度（reselect加速join）
+ 

@@ -5,6 +5,7 @@ import TodoItem from "./TodoItem";
 // import {deleteTodo, toggleTodo} from "../actions";
 import {connect} from "react-redux";
 import filterType from "../../filter/filterType";
+import {createSelector} from "reselect";
 // import {bindActionCreators} from "redux";
 
 
@@ -23,7 +24,21 @@ const TodoList = function ({todos}) {
 TodoList.propTypes = {
     todos:PropTypes.array.isRequired
 }
-const getShowList = function ({todos,filter}) {
+// const getShowList = function ({todos,filter}) {
+//     switch (filter){
+//         case filterType.all:
+//             return todos
+//         case filterType.completed:
+//             return todos.filter(todo=>todo.completed)
+//         case filterType.unCompleted:
+//             return todos.filter(todo=>!todo.completed)
+//         default:
+//             throw new Error('unsupported filter type')
+//     }
+// }
+const getFilter = state => state.filter
+const getTodos = state => state.todos
+const getShowList = createSelector([getTodos, getFilter],function (todos,filter) {
     switch (filter){
         case filterType.all:
             return todos
@@ -34,7 +49,8 @@ const getShowList = function ({todos,filter}) {
         default:
             throw new Error('unsupported filter type')
     }
-}
+})
+
 const mapStateToProps = function (state) {
     return {
         todos:getShowList(state)
