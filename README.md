@@ -507,4 +507,21 @@ const mapStateToProps = function (state) {
 降低修改难度
 
 提高读取难度（reselect加速join）
- 
+
+# 6. React高级组件
+## 6.1 高阶组件
+HOC:
+ - @param component
+ - @param some extra param
+ - @return enhanced component
+
+作用:
+ - 重用代码
+ - 修改现有组件的行为
+
+实现方式:
+ - 代理方式的高阶组件
+ - 继承方式的高阶组件
+
+### 6.1.1 代理
+#### 1.操纵prop
