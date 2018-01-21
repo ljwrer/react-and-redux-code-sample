@@ -1,12 +1,14 @@
-## 1.2
+# 1. react思维
+## 1.2 react事件
 React使用事件委托处理事件,无论多少个onClick,最后都之添加一个事件处理函数,
 挂在最顶层节点
 
-## 2.2
-### 2.2.1
+# 2. react组件
+## 2.2 数据
+### 2.2.1 prop
 使用babel-react-optimize在生产环境移除propTypes
 
-### 2.2.2
+### 2.2.2 state
 使用static defaultProps提供默认值
 
 ## 2.3 生命周期
@@ -101,7 +103,7 @@ enter componentDidUpdate Parent
 ```
 移除非react创造的dom和事件
 
-## 2.4
+## 2.4 向外传递
 需要挂载在render的方法在construct中先bind
 
 ## 2.5 prop和state局限
@@ -524,4 +526,289 @@ HOC:
  - 继承方式的高阶组件
 
 ### 6.1.1 代理
+两个组件都要经历各自的生命周期
+
 #### 1.操纵prop
+```js
+const addNewProps = function (WrappedComponent, newProps) {
+    return class WrappingComponent extends Component{
+        render(){
+            return <WrappedComponent {...this.props} {...newProps}/>
+        }
+    }
+}
+```
+
+#### 2.访问ref
+获取顶层节点，不推荐使用
+```js
+const getRefHOC = function (WrappedComponent, newProps) {
+    return class WrappingComponent extends Component{
+        constructor(){
+            super(...arguments)
+            this.getRef = this.getRef.bind(this)
+        }
+        getRef(node){
+            this._root = node
+        }
+        render(){
+            return <WrappedComponent {...this.props} {...newProps} ref={this.getRef}/>
+        }
+    }
+}
+```
+
+#### 3.抽取状态
+```js
+const connect = function (mapStateToProps, mapDispatchToProps) {
+    return function (WrappedComponent) {
+        return class ConnectWrappedComponent extends Component{
+            render(){
+                const store = this.context.store;
+                const newProps = {
+                    ...this.props,
+                    ...mapStateToProps(state,this.props),
+                    ...mapDispatchToProps(store,dispatch,this.props)
+                }
+                return <WrappedComponent {...newProps} />;
+            }
+        }
+    }
+}
+```
+
+#### 4.包装组件
+```js
+const styleHOC = function (WrappedComponent, style) {
+    return class HOCComponent extends Component{
+        render(){
+            return <div style={style}>
+                <WrappedComponent {...this.props}/>
+            </div>
+        }
+    }
+}
+```
+
+### 6.1.2 继承
+#### 1.操纵props
+当高阶组件需要依赖WrappedComponent渲染结果才使用
+```js
+const modifyPropsHOC = (WrappedComponent) => {
+  return class NewComponent extends WrappedComponent {
+    render() {
+      const elements = super.render();
+      const newStyle = {
+        color: (elements && elements.type === 'div') ? 'red' : 'green'
+      }
+      const newProps = {...this.props, style: newStyle};
+      return React.cloneElement(elements, newProps, elements.props.children);
+    }
+  };
+};
+```
+#### 2.操纵生命周期函数
+
+```js
+const onlyForLoggedinHOC = (WrappedComponent) => {
+    return class NewComponent extends WrappedComponent {
+        render() {
+            if (this.props.loggedIn) {
+                return super.render();
+            } else {
+                return null;
+            }
+        }
+    }
+}
+```
+
+### 6.1.3 显示名
+```
+function getDisplayName(WrappedComponent) {
+    return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+}
+HOCComponent.displayName = `prefix${getDisplayName(WrappedComponent)}`
+```
+
+## 6.2 函数作为子组件
+高阶组件对原组件prop有固化要求(只接受能用到的props)
+
+要求原组件必须有子组件且子组件为一个返回组件的函数(也可以通过属性传递)
+
+# 7.Redux和异步
+## 7.1 React组件访问服务器
+开发环境:package.json -> proxy   
+componentDidMount是最佳获取初始化组件内容请求的时机
+
+返回的结果都应该验证，不要相信任何返回结果
+
+## 7.2 Redux访问服务器
+### 7.2.1 Redux-thunk
+拦截函数类型的action
+```js store.js
+import thunkMiddleware from 'redux-thunk'
+const store = createStore(reducer,applyMiddlewares(thunkMiddleware))
+```
+```js actions.js
+const sampleAsyncAction = () => {
+	return (dispatch, getState)=>{
+		//do async then dispatch action
+	}
+}
+```
+
+### 7.2.4 异步操作的中止
+业务层中止
+
+>乐观更新:在服务端响应前直接更新视图，等待服务器响应后再次更新视图(如有必要)
+
+# 8. 单元测试
+## 8.2 测试环境
+Jest
+ - .test.js
+ - `__test__`
+
+### 8.2.3 辅助工具
+1.Enzyme,react-addons-test-utils
+ - shadow
+ - mount
+ - render
+
+2.sinon
+3.redux-mock-store
+action对象不需要派发到reducer中，只要检查action对象是否被派发  
+store扩展getActions方法
+
+## 8.3 单元测试实例
+### 8.3.2 异步action测试
+```js
+import thunk from 'redux-thunk';
+import configureStore from 'redux-mock-store';
+const middlewares = [thunk];
+const createMockStore = configureStore(middlewares);
+```
+### 8.3.4 无状态组件测试
+测试是否创造了子组件以及属性传递正确即可
+
+### 8.3.5 测试被连接的组件
+调用store.dispatch action验证wrapper对象上的渲染是否符合预期  
+底层组件可以直接调用store，无需依赖provider
+
+# 9.扩展redux
+## 9.1 中间件
+### 9.1.1 中间件接口
+action对象进入reducer之前，会经历中间件的管道
+```js
+const doNothingMiddleware = function ({dispatch,getState}) {
+    return function (next) {
+        return function (action) {
+            return next(action)
+        }
+    }
+}
+const createThunkMiddleware = function(...args){
+    return function ({dispatch,getState}) {
+        return function (next) {
+            return function (action) {
+                if(typeof action === 'function'){
+                    return action(dispatch,getState,...args)
+                }
+                return next(action)
+            }
+        }
+    }
+}
+```
+每个中间件最里层处理action参数的函数返回值都会影响store上dispatch函数的返回值，所以不要依赖dispatch函数的返回值
+
+### 9.1.2 使用中间件
+1.产生新的createStore
+不适合多个store Enhance
+```
+import {createStore,applyMiddleware} from 'redux'
+import thunkMiddleware from 'redux-thunk'
+const configStore = applyMiddleware(thunkMiddleware)(createStore)
+const store = configStore(reducer,initialState)
+```
+2.applyMiddleware得到store Enhance后与其他Enhance混合（compose）
+一定要把applyMiddleware放在其他Enhance之前
+```js
+import {createStore,applyMiddleware} from 'redux'
+import thunkMiddleware from 'redux-thunk'
+const middlewares = [thunkMiddleware]
+
+const storeEnhance = compose(applyMiddleware(...middlewares),...otherStoreEnhance)
+const store = configStore(reducer,initialState,storeEnhance)
+```
+
+### 9.1.3 Promise中间件
+```
+const PromiseMiddleware = function(...args){
+    return function ({dispatch,getState}) {
+        return function (next) {
+            return function (action) {
+                const {types,promise,...rest} = action
+                if(isPromise(promise)&&types.length===3){
+                    const [PEND,SUC,FAIL] = types
+                    dispatch({
+                        ...rest,
+                        type: PEND
+                    })
+                    return promise.then(result=>{
+                        dispatch({
+                            ...rest,
+                            type: SUC,
+                            result
+                        })
+                    }).catch(error=>{
+                        dispatch({
+                            ...rest,
+                            type: FAIL,
+                            error
+                        })
+                    })
+                }
+                return next(action)
+            }
+        }
+    }
+}
+```
+
+### 9.1.4 中间件开发原则
+ - 考虑到其他中间件
+ - 单一职责
+ - 注意dispatch和next差异
+
+## 9.2 Store Enhancer
+### 9.2.1 增强器接口
+createStore->store->enhance store->return store
+```
+const doNothingEnhance = function (createStore) {
+    return function (reducer,preloadState,enhancer) {
+        const  store = createStore(reducer,preloadState,enhancer)
+        return store
+    }
+}
+```
+store接口:
+ - dispatch
+ - subscribe
+ - getState
+ - replaceReducer
+
+使用Monkey patch不破坏redux默认功能
+```
+const logEnhance = function (createStore) {
+    return function (reducer,preloadState,enhancer) {
+        const  store = createStore(reducer,preloadState,enhancer)
+        const originDispatch = store.dispatch
+        store.dispatch = function (action) {
+            console.log(`dispatch action:${action}`)
+            originDispatch(action)
+        }
+        return store
+    }
+}
+```

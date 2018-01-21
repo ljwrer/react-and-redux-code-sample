@@ -17,7 +17,6 @@ export default function (state=[], action) {
                 }
                 return todo
             })
-
         default:
             return state
     }

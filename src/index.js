@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TodoMVC from "./todomvc";
+// import TodoMVC from "./todomvc";
+// import FuncHOCApp from "./hoc";
+import ReduxThunkApp from "./redux-thunk";
 // import LifeCycle from './LifeCycle';
 // import PropUsage from './PropUsage'
 // import {FluxApp} from "./flux";
@@ -15,5 +17,7 @@ import TodoMVC from "./todomvc";
 // ReactDOM.render(<ReduxSmartDumpApp />, document.getElementById('redux'));
 // ReactDOM.render(<ReduxContextApp />, document.getElementById('redux-context'));
 // ReactDOM.render(<ReactReduxApp />, document.getElementById('react-redux'));
-ReactDOM.render(<TodoMVC/>, document.getElementById('todo-mvc'));
+// ReactDOM.render(<TodoMVC/>, document.getElementById('todo-mvc'));
+// ReactDOM.render(<FuncHOCApp/>, document.getElementById('func-hoc'));
+ReactDOM.render(<ReduxThunkApp/>, document.getElementById('redux-thunk'));
 
