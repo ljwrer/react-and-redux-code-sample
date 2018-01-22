@@ -15,5 +15,13 @@ if(process.env.NODE_ENV!=='production'){
     middlewares.push(require('redux-immutable-state-invariant').default())
 }
 const storeEnhancers = composeEnhancers(applyMiddleware(...middlewares))
-const store = createStore(reducer,{},storeEnhancers)
+const store = createStore(reducer,{
+    todos:[
+        {
+            id:'xxx',
+            completed:false,
+            text:'hello'
+        }
+    ]
+},storeEnhancers)
 export default store

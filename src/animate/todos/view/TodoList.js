@@ -7,17 +7,43 @@ import {connect} from "react-redux";
 import filterType from "../../filter/filterType";
 import {createSelector} from "reselect";
 import {CSSTransition, TransitionGroup} from 'react-transition-group'
+import {spring, TransitionMotion} from "react-motion";
 // import {bindActionCreators} from "redux";
 
 
 const TodoList = function ({todos}) {
+    const styles = todos.map(todo => ({
+        key: todo.id.toString(),
+        data: todo,
+        style: {
+            height: spring(20),
+            opacity: spring(1)
+        }
+    }))
+    const defaultStyles = todos.map(todo => ({
+        key: todo.id.toString(),
+        data: todo,
+        style: {
+            height: 0,
+            opacity: 0
+        }
+    }))
+    const willEnter = () => ({
+        height: 0,
+        opacity: 0
+    })
+    const willLeave = () => ({
+        height: spring(0),
+        opacity: spring(0)
+    })
     return (<div>
         <TodoAdd></TodoAdd>
-        <TransitionGroup>
+        {
+        <TransitionGroup appear={true}>
             {
                 todos.map(todoItem => {
                     return (
-                        <CSSTransition>
+                        <CSSTransition key={todoItem.id} timeout={1000} classNames="fade">
                             <TodoItem key={todoItem.id} id={todoItem.id} text={todoItem.text}
                                       completed={todoItem.completed}/>
                         </CSSTransition>
@@ -25,6 +51,20 @@ const TodoList = function ({todos}) {
                 })
             }
         </TransitionGroup>
+        }
+        <TransitionMotion willLeave={willLeave} willEnter={willEnter} styles={styles} defaultStyles={defaultStyles}>
+            {
+                interpolatedStyles => (<div>
+                        {
+                            interpolatedStyles.map(({data: todoItem, key, style}) => {
+                                return (
+                                    <TodoItem key={key} id={todoItem.id} text={todoItem.text} completed={todoItem.completed}
+                                              style={style}/>)
+                            })
+                        }
+                </div>)
+            }
+        </TransitionMotion>
     </div>)
 }
 TodoList.propTypes = {

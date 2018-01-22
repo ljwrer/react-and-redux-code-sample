@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from "react-redux";
 import {deleteTodo, toggleTodo} from "../actions";
-const TodoItem = function ({text,onRemove,onToggle,completed}) {
+const TodoItem = function ({text,onRemove,onToggle,completed,style}) {
     console.log('render TodoItem')
-    return (<div>
+    return (<div style={style}>
         <input type="checkbox" onChange={onToggle} readOnly checked={completed}/>
         <span style={{
             textDecoration: completed ? 'line-through' : 'none'

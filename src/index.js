@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import TodoMVC from "./todomvc";
 // import FuncHOCApp from "./hoc";
-import ReduxThunkApp from "./redux-thunk";
+// import ReduxThunkApp from "./redux-thunk";
+import Animate from "./animate";
 // import LifeCycle from './LifeCycle';
 // import PropUsage from './PropUsage'
 // import {FluxApp} from "./flux";
@@ -19,5 +20,6 @@ import ReduxThunkApp from "./redux-thunk";
 // ReactDOM.render(<ReactReduxApp />, document.getElementById('react-redux'));
 // ReactDOM.render(<TodoMVC/>, document.getElementById('todo-mvc'));
 // ReactDOM.render(<FuncHOCApp/>, document.getElementById('func-hoc'));
-ReactDOM.render(<ReduxThunkApp/>, document.getElementById('redux-thunk'));
+// ReactDOM.render(<ReduxThunkApp/>, document.getElementById('redux-thunk'));
+ReactDOM.render(<Animate/>, document.getElementById('animate'));
 
