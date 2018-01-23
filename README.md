@@ -3,6 +3,8 @@
 React使用事件委托处理事件,无论多少个onClick,最后都之添加一个事件处理函数,
 挂在最顶层节点
 
+---
+
 # 2. react组件
 ## 2.2 数据
 ### 2.2.1 prop
@@ -108,6 +110,8 @@ enter componentDidUpdate Parent
 
 ## 2.5 prop和state局限
 耦合度高,使用全局状态作为唯一可靠的数据
+
+---
 
 # 3.Flux和Redux
 ## 3.1 Flux
@@ -271,6 +275,8 @@ const mapDispatchToProps = function(dispatch, ownProps){
 
 componentWillReceiveProps:检查代表store的prop是否一致
 
+---
+
 # 4. 模块化
 ### 4.2.2 按功能组织
 ```
@@ -401,6 +407,8 @@ const storeEnhancers = composeEnhancers(applyMiddleware(...middlewares))
 const store = createStore(reducer,{},storeEnhancers)
 ```
 
+---
+
 # 5. 组件性能优化
 ## 5.1 单组件优化
 ### 5.1.1 渲染时间
@@ -509,6 +517,8 @@ const mapStateToProps = function (state) {
 降低修改难度
 
 提高读取难度（reselect加速join）
+
+---
 
 # 6. React高级组件
 ## 6.1 高阶组件
@@ -636,6 +646,8 @@ HOCComponent.displayName = `prefix${getDisplayName(WrappedComponent)}`
 
 要求原组件必须有子组件且子组件为一个返回组件的函数(也可以通过属性传递)
 
+---
+
 # 7.Redux和异步
 ## 7.1 React组件访问服务器
 开发环境:package.json -> proxy   
@@ -662,6 +674,8 @@ const sampleAsyncAction = () => {
 业务层中止
 
 >乐观更新:在服务端响应前直接更新视图，等待服务器响应后再次更新视图(如有必要)
+
+---
 
 # 8. 单元测试
 ## 8.2 测试环境
@@ -694,6 +708,8 @@ const createMockStore = configureStore(middlewares);
 ### 8.3.5 测试被连接的组件
 调用store.dispatch action验证wrapper对象上的渲染是否符合预期  
 底层组件可以直接调用store，无需依赖provider
+
+---
 
 # 9.扩展redux
 ## 9.1 中间件
@@ -812,3 +828,123 @@ const logEnhance = function (createStore) {
     }
 }
 ```
+
+---
+
+# 10.动画
+## 10.1 动画实现方式
+### 10.1.1 css3方式
+ - 无需解释js
+ - gpu加速
+ - 取消操作不流畅
+ - 捕捉不到中间状态
+
+指定时间和速度曲线
+
+### 10.1.2 脚本方式
+ - 消耗计算资源
+ - 容易卡顿滞后
+
+#### 修复定时器
+不按固定时间渲染，而是按需渲染
+requestAniamtionFrame
+```js
+const getRaf = function () {
+    let timeStamp = Date.now()
+    return function (fn) {
+        const currentTimeStamp = Date.now()
+        const gap = currentTimeStamp - timeStamp
+        const delay = Math.max(0, 16 - gap)
+        const tid = setTimeout(function () {
+            fn(currentTimeStamp)
+        }, delay)
+        timeStamp = currentTimeStamp
+        return tid
+    }
+}
+const raf = getRaf()
+const animate = (function (ele) {
+    const timeStamp = Date.now()
+    return function (currentTimeStamp) {
+        const dist = (currentTimeStamp - timeStamp)/16
+        ele.style.transform = `translateX(${dist}px)`
+        if(dist<1000){
+            raf(animate)
+        }
+
+    }
+})(document.getElementById('box'))
+```
+## 10.2 react-transition-group
+帮助实现装载过程和卸载过程的动画
+```js
+<TransitionGroup appear={true}>
+    {
+        todos.map(todoItem => {
+            return (
+                <CSSTransition key={todoItem.id} timeout={1000} classNames="fade">
+                    <TodoItem key={todoItem.id} id={todoItem.id} text={todoItem.text}
+                              completed={todoItem.completed}/>
+                </CSSTransition>
+            )
+        })
+    }
+</TransitionGroup>
+```
+
+### 10.2.2 TransitionGroup规则
+1. 类名
+2. 动画事件长度
+	- 删除类名
+3. 装载时机
+	- 必须自身装载完,子组件才有动画
+4. 首次装载
+	- appear
+
+## 10.3 React-motion
+### 10.3.1 设计原则
+ - 友好的API比性能重要
+ - 以刚度(stiffness)和阻尼(damping)定义动画,而不是事件和速度曲线
+ - 只提供参数，不直接参与动画绘制
+ - 以函数作为子组件
+
+### 10.3.2 api
+```
+<TransitionMotion willLeave={willLeave} willEnter={willEnter} styles={styles} defaultStyles={defaultStyles}>
+    {
+        interpolatedStyles => (<div>
+                {
+                    interpolatedStyles.map(({data: todoItem, key, style}) => {
+                        return (
+                            <TodoItem key={key} id={todoItem.id} text={todoItem.text} completed={todoItem.completed}
+                                      style={style}/>)
+                    })
+                }
+        </div>)
+    }
+</TransitionMotion>
+```
+组件
+ - TransitionMotion
+ - Motion
+ - StaggredMotion
+	 - 固定数量组件相互依赖
+属性
+ - willLeave
+ - willEnter
+ - defaultStyles
+ - styles
+	 - key
+	 - data
+	 - style
+ - children
+	 - interpolatedStyles => component
+	 - interpolatedStyles
+		 - data -> component prop
+		 - key -> component key
+		 - style -> component style
+ - @spring
+
+---
+
+# 11. 多页面应用
