@@ -948,3 +948,62 @@ const animate = (function (ele) {
 ---
 
 # 11. 多页面应用
+## 11.1 单页应用
+ - 页面切换不引发刷新
+	 - history api
+ - 页面内容与url保持一致
+	 - 可收藏
+	 - 可刷新
+ - 服务器对于任何url返回同一个html
+
+## 11.2 React-Router
+router(path)=>UI
+
+组件作为页面，路由功能以组件形式表达
+
+### 11.2.2 链接和嵌套
+ - Link
+ - Route
+ - Switch
+	 - 默认链接
+
+### 11.2.4 集成redux
+获取路由信息的唯一数据源为url，保持和redux绝对同步
+```
+<Provider store={store}>
+    <ConnectedRouter history={history}>
+        <div>
+            <Route path='/root' render={(props)=>{
+                const { match } = props
+                return (<div>
+                    <TopMenu {...props}/>
+                    <Switch>
+                        <Route exact path={`${match.url}/`} component={Home}/>
+                        <Route path={`${match.url}/home`} component={Home}/>
+                        <Route path={`${match.url}/about`} component={About}/>
+                        <Route component={NotFound}/>
+                    </Switch>
+                </div>)
+            }} />
+        </div>
+    </ConnectedRouter>
+</Provider>
+```
+```
+const history = createHistory()
+middlewares.push(routerMiddleware(history))
+const store = createStore(
+    combineReducers({
+        router: routerReducer
+    }),
+    composeEnhancers(applyMiddleware(...middlewares))
+)
+```
+
+## 11.3 代码分片
+ - bundle.js
+	 - 启动代码
+ - commom.js
+	 - 通用模块
+ - chunk
+	 - 页面模块
