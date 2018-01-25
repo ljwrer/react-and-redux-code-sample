@@ -1,9 +1,9 @@
 import React from 'react'
-import {Switch,BrowserRouter as Router ,Route,Link} from 'react-router-dom'
+import {Switch,Route,Link} from 'react-router-dom'
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import createHistory from 'history/createBrowserHistory'
-import { ConnectedRouter, routerReducer, routerMiddleware, push } from 'react-router-redux'
+import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux'
 import * as pages from './pages'
 const win = window
 const middlewares = []
@@ -19,9 +19,7 @@ const store = createStore(
     }),
     composeEnhancers(applyMiddleware(...middlewares))
 )
-const Home = () => (<div>home</div>)
-const About = () => (<div>About</div>)
-const NotFound = () => (<div>NotFound</div>)
+
 const TopMenu = ({match}) => (<ul>
     <li><Link to='/home'>home</Link></li>
     <li><Link to='/about'>about</Link></li>
