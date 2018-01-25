@@ -29,8 +29,10 @@ const TopMenu = ({match}) => (<ul>
 const RouterApp = () => (<Provider store={store}>
     <ConnectedRouter history={history}>
         <div>
-            <Route render={(props)=>{
+            {/* <Route path='/root/' render={(props)=>{ */}
+            <Route path='/' render={(props)=>{
                 const { match } = props
+                console.log(match)
                 return (<div>
                     <TopMenu {...props}/>
                     <Switch>
