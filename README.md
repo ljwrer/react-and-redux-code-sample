@@ -1061,3 +1061,31 @@ const Counter = asyncComponent(()=>import('./CounterPage').then(({page, reducer,
 webpack打包是对代码作静态扫描，因此import路径需要硬编码才能分片
 
 stateKey标记模块
+
+---
+
+# 12 同构
+## 12.1 服务器渲染和浏览器渲染
+ - 服务器渲染
+	 - 局部更新慢
+	 - SEO友好
+ - 浏览器渲染
+	 - TTFP（首次渲染时间）
+	 - TTI(首次可交互时间)
+	 - 服务器负载低，CDN加速
+
+浏览器渲染：
+ - 应用框架
+	 - react-router+redux
+ - 模板库
+	 - react
+ - 服务端api
+	 - RESTful API
+
+浏览器渲染流程
+ 1. get html from app server
+ 2. get js from static server(cache)
+ 3. get data from api server
+
+三个http请求
+>html和data可通过PWA manifest和service worker优化
