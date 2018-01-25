@@ -11,7 +11,7 @@ export default function asyncComponent(importComponent) {
         }
 
         async componentDidMount() {
-            const { default: component } = await importComponent();
+            const component = await importComponent();
 
             this.setState({
                 component: component
@@ -20,7 +20,6 @@ export default function asyncComponent(importComponent) {
 
         render() {
             const C = this.state.component;
-
             return C ? <C {...this.props} /> : null;
         }
     }

@@ -1007,3 +1007,57 @@ const store = createStore(
 	 - 通用模块
  - chunk
 	 - 页面模块
+
+### 11.3.1 webpack
+commonsChunkPlugin
+
+### 11.3.2 动态加载
+动态组件
+```
+import React, { Component } from "react";
+
+export default function asyncComponent(importComponent) {
+    class AsyncComponent extends Component {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                component: null
+            };
+        }
+
+        async componentDidMount() {
+            const component = await importComponent();
+
+            this.setState({
+                component: component
+            });
+        }
+
+        render() {
+            const C = this.state.component;
+            return C ? <C {...this.props} /> : null;
+        }
+    }
+
+    return AsyncComponent;
+}
+```
+动态redux
+```js
+const Counter = asyncComponent(()=>import('./CounterPage').then(({page, reducer, stateKey, initialState})=>{
+    const state = store.getState();
+    store.reset(combineReducers({
+        ...store._reducers,
+        counter: reducer
+    }), {
+        ...state,
+        [stateKey]: initialState
+    });
+    return page
+}))
+```
+
+webpack打包是对代码作静态扫描，因此import路径需要硬编码才能分片
+
+stateKey标记模块
