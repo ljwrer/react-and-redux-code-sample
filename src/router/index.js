@@ -3,36 +3,32 @@ import {Switch,Route,Link} from 'react-router-dom'
 import { Provider } from 'react-redux'
 import createHistory from 'history/createBrowserHistory'
 import { ConnectedRouter} from 'react-router-redux'
-import * as pages from './pages'
+import {Counter,home,about,notFound} from './pages'
+import GlobalCounter from './GlobalCounter'
 import store from './Store'
 const history = createHistory()
 
 
-const TopMenu = ({match}) => (<ul>
+const TopMenu = () => (<ul>
     <li><Link to='/home'>home</Link></li>
     <li><Link to='/about'>about</Link></li>
     <li><Link to='/not found'>404</Link></li>
     <li><Link to='/counter'>counter</Link></li>
-    <li><Link to={`${match.url}home`}>home</Link></li>
 </ul>)
-const RouterApp = () => (<Provider store={store}>
-    <ConnectedRouter history={history}>
-        <div>
-            {/* <Route path='/root/ render=(props)=> */}
-            <Route path='/' render={(props)=>{
-                const { match } = props
-                return (<div>
-                    <TopMenu {...props}/>
-                    <Switch>
-                        <Route exact path={`${match.url}`} component={pages.home}/>
-                        <Route path={`${match.url}home`} component={pages.home}/>
-                        <Route path={`${match.url}about`} component={pages.about}/>
-                        <Route path={`${match.url}counter`} component={pages.Counter}/>
-                        <Route component={pages.notFound}/>
-                    </Switch>
-                </div>)
-            }} />
-        </div>
-    </ConnectedRouter>
-</Provider>)
+const RouterApp = (props,context) => (<Provider store={store}>
+        <ConnectedRouter history={history}>
+            <div>
+                <TopMenu />
+                <Switch>
+                    <Route exact path="/" component={home} />
+                    <Route exact path="/home" component={home} />
+                    <Route exact path="/about" component={about} />
+                    <Route exact path="/counter" component={Counter} />
+                    <Route path="*" component={notFound} />
+                </Switch>
+                <GlobalCounter></GlobalCounter>
+            </div>
+        </ConnectedRouter>
+    </Provider>)
+
 export default RouterApp

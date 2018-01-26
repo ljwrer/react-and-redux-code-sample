@@ -57,7 +57,9 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "server": "set NODE_ENV=production&&node server/index.js",
+    "server-dev": "set NODE_ENV=development&&node server/index.js"
   },
   "devDependencies": {
     "prop-types": "^15.6.0",
@@ -104,6 +106,9 @@
   "babel": {
     "presets": [
       "react-app"
+    ],
+    "plugins": [
+      "react-hot-loader/babel"
     ]
   },
   "eslintConfig": {

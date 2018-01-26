@@ -11,6 +11,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const ManifestPlugin = require('webpack-manifest-plugin')
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -45,7 +46,9 @@ module.exports = {
         // the line below with these two lines if you prefer the stock client:
         // require.resolve('webpack-dev-server/client') + '?/',
         // require.resolve('webpack/hot/dev-server'),
-        require.resolve('react-dev-utils/webpackHotDevClient'),
+        // require.resolve('react-dev-utils/webpackHotDevClient'),
+        require.resolve('webpack-hot-middleware/client'),
+        require.resolve('react-hot-loader/patch'),
         // Finally, this is your app's code:
         paths.appIndexJs,
         // We include the app code last so that if there is a runtime error during
@@ -246,7 +249,11 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin({
             name:'common',
             filename:'static/js/common.js'
-        })
+        }),
+        // for dev hot reload
+        new ManifestPlugin({
+            fileName: 'asset-manifest.json',
+        }),
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.

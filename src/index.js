@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 // import ReduxThunkApp from "./redux-thunk";
 // import Animate from "./animate";
 import RouterApp from "./router";
+import {AppContainer} from 'react-hot-loader';
 // import LifeCycle from './LifeCycle';
 // import PropUsage from './PropUsage'
 // import {FluxApp} from "./flux";
@@ -24,4 +25,23 @@ import RouterApp from "./router";
 // ReactDOM.render(<ReduxThunkApp/>, document.getElementById('redux-thunk'));
 // ReactDOM.render(<Animate/>, document.getElementById('animate'));
 ReactDOM.render(<RouterApp/>, document.getElementById('router'));
+const rootEl = document.getElementById('router');
+
+ReactDOM.render(
+    <AppContainer>
+        <RouterApp />
+    </AppContainer>,
+    rootEl
+);
+if (module.hot) {
+    module.hot.accept('./router/pages/home', () => {
+        const NewRouterApp = require('./router/pages/home').default; // eslint-disable-line global-require
+        ReactDOM.render(
+            <AppContainer>
+                <NewRouterApp />
+            </AppContainer>,
+            rootEl
+        );
+    });
+}
 

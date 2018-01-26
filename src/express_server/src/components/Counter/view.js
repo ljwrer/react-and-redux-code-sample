@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types'
+import React, { PropTypes } from 'react';
+import {bindActionCreators} from 'redux';
 import {increment, decrement} from './actions.js';
 import {connect} from 'react-redux';
 
@@ -29,20 +29,10 @@ const mapStateToProps = (state) => ({
   value: state[stateKey] || 0
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  onIncrement: ()=>{
-      dispatch(increment())
-      dispatch({
-          type:'GLOBAL/COUNT'
-      })
-  },
-  onDecrement: ()=>{
-      dispatch(decrement())
-      dispatch({
-          type:'GLOBAL/COUNT'
-      })
-  }
-});
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  onIncrement: increment,
+  onDecrement: decrement
+}, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Counter);
 
