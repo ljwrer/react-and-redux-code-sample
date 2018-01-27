@@ -1,33 +1,30 @@
 import React from 'react'
-import {Switch,Route,Link} from 'react-router-dom'
+import {Switch,Route} from 'react-router-dom'
 import { Provider } from 'react-redux'
-import createHistory from 'history/createBrowserHistory'
 import { ConnectedRouter} from 'react-router-redux'
-import {Counter,home,about,notFound} from './pages'
+import {home, about, notFound, Counter} from './pages'
 import GlobalCounter from './GlobalCounter'
 import store from './Store'
-const history = createHistory()
+import TopMenu from './TopMenu'
+import history from "./history"
 
+const routes = (
+    <div>
+        <TopMenu />
+        <Switch>
+            <Route exact path="/" component={home} />
+            <Route exact path="/home" component={home} />
+            <Route exact path="/about" component={about} />
+            <Route exact path="/counter" component={Counter} />
+            <Route path="*" component={notFound} />
+        </Switch>
+        <GlobalCounter></GlobalCounter>
+    </div>
+);
 
-const TopMenu = () => (<ul>
-    <li><Link to='/home'>home</Link></li>
-    <li><Link to='/about'>about</Link></li>
-    <li><Link to='/not found'>404</Link></li>
-    <li><Link to='/counter'>counter</Link></li>
-</ul>)
-const RouterApp = (props,context) => (<Provider store={store}>
+const RouterApp = () => (<Provider store={store}>
         <ConnectedRouter history={history}>
-            <div>
-                <TopMenu />
-                <Switch>
-                    <Route exact path="/" component={home} />
-                    <Route exact path="/home" component={home} />
-                    <Route exact path="/about" component={about} />
-                    <Route exact path="/counter" component={Counter} />
-                    <Route path="*" component={notFound} />
-                </Switch>
-                <GlobalCounter></GlobalCounter>
-            </div>
+            {routes}
         </ConnectedRouter>
     </Provider>)
 

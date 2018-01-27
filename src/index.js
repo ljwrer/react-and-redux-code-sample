@@ -24,24 +24,20 @@ import {AppContainer} from 'react-hot-loader';
 // ReactDOM.render(<FuncHOCApp/>, document.getElementById('func-hoc'));
 // ReactDOM.render(<ReduxThunkApp/>, document.getElementById('redux-thunk'));
 // ReactDOM.render(<Animate/>, document.getElementById('animate'));
-ReactDOM.render(<RouterApp/>, document.getElementById('router'));
-const rootEl = document.getElementById('router');
-
-ReactDOM.render(
-    <AppContainer>
-        <RouterApp />
-    </AppContainer>,
-    rootEl
-);
-if (module.hot) {
-    module.hot.accept('./router/pages/home', () => {
-        const NewRouterApp = require('./router/pages/home').default; // eslint-disable-line global-require
-        ReactDOM.render(
-            <AppContainer>
-                <NewRouterApp />
-            </AppContainer>,
-            rootEl
-        );
-    });
+const render = Component => {
+    ReactDOM.render(
+        <AppContainer>
+            <Component />
+        </AppContainer>,
+        document.getElementById('router'),
+    )
 }
 
+render(RouterApp)
+
+// Webpack Hot Module Replacement API
+if (module.hot) {
+    module.hot.accept('./router', () => {
+        render(RouterApp)
+    })
+}
