@@ -1,4 +1,4 @@
-import store from '../Store.js';
+import {store} from '../index.js';
 import {combineReducers} from "redux";
 import Loadable from 'react-loadable';
 import Loading from './loading';

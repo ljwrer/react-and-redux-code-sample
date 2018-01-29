@@ -4,10 +4,11 @@ import { Provider } from 'react-redux'
 import { ConnectedRouter} from 'react-router-redux'
 import {home, about, notFound, Counter} from './pages'
 import GlobalCounter from './GlobalCounter'
-import store from './Store'
+import {configureStore} from './Store'
 import TopMenu from './TopMenu'
 import history from "./history"
-
+const store = configureStore()
+export {store}
 const routes = (
     <div>
         <TopMenu />
