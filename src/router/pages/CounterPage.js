@@ -1,5 +1,5 @@
 import React from 'react';
-import {view as Counter, stateKey, reducer} from '../Counter';
+import {view as Counter, stateKey, reducer, initState} from '../Counter';
 
 const page = () => {
   return (
@@ -10,6 +10,4 @@ const page = () => {
   );
 };
 
-const initialState = 100;
-
-export {page, reducer, initialState, stateKey};
+export {page, reducer, initState, stateKey};

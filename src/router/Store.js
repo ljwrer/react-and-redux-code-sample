@@ -14,7 +14,7 @@ const configureStore = () => {
     }
     const reducer = combineReducers(originalReducers);
 
-    const win = window;
+    const win = typeof window  === "undefined"?null:window;
 
     const middlewares = [];
     if(process.env.NODE_ENV!=='production'){

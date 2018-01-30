@@ -12,7 +12,7 @@ const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const ManifestPlugin = require('webpack-manifest-plugin')
-
+const ReactLoadablePlugin = require('react-loadable/webpack');
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
 const publicPath = '/';
@@ -153,7 +153,8 @@ module.exports = {
                             // directory for faster rebuilds.
                             cacheDirectory: true,
                             "plugins": [
-                                "react-hot-loader/babel"
+                                "react-hot-loader/babel",
+                                "react-loadable/babel"
                             ]
                         },
                     },
@@ -223,10 +224,10 @@ module.exports = {
         // In development, this will be an empty string.
         new InterpolateHtmlPlugin(env.raw),
         // Generates an `index.html` file with the <script> injected.
-        new HtmlWebpackPlugin({
-            inject: true,
-            template: paths.appHtml,
-        }),
+        // new HtmlWebpackPlugin({
+        //     inject: true,
+        //     template: paths.appHtml,
+        // }),
         // Add module names to factory functions so they appear in browser profiler.
         new webpack.NamedModulesPlugin(),
         // Makes some environment variables available to the JS code, for example:

@@ -1,20 +1,19 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import {Router, Route, match, RouterContext, IndexRoute, browserHistory} from 'react-router';
 import {Provider} from 'react-redux';
 import {combineReducers} from 'redux';
-
+import {Route, Switch, StaticRouter } from "react-router-dom";
+//store
 import {configureStore} from '../src/router/Store.js';
+//pages
+import {home,about,notFound,Counter} from '../src/router/pages';
+import {stateKey, initState, reducer} from '../src/router/pages/CounterPage.js';
 
-import home from '../src/router/pages/home.js';
-import {page as Counter, reducer, stateKey, initialState} from '../src/router/pages/CounterPage.js';
-import about from '../src/router/pages/about.js';
-import notFound from '../src/router/pages/404.js';
-
+//components
 import GlobalCounter from '../src/router/GlobalCounter'
-import TopMenu from './src/roTopMenu'
-import {Route, Switch} from "react-router-dom";
-const store = configureStore()
+import TopMenu from '../src/router/TopMenu'
+
+
 const routes = (
     <div>
         <TopMenu />
@@ -34,7 +33,7 @@ const pathInitData = {
   '/counter': {
     stateKey,
     reducer,
-    initialState
+    initState
   }
 }
 
@@ -68,7 +67,7 @@ function renderMatchedPage(req, res, renderProps, assetManifest) {
     );
 
     const dehydratedState= store.getState();
-
+      // res.status(staticContext.statusCode || 200).send(html)
     return res.render('index', {
       title: 'Sample React App',
       PUBLIC_URL: '/',
@@ -79,21 +78,45 @@ function renderMatchedPage(req, res, renderProps, assetManifest) {
   });
 }
 
-export const renderPage = (req, res, assetManifest) => {
-    const appHtml = ReactDOMServer.renderToString(
-        <Provider store={store}>
-            <StaticRouter location={req.url}>
-                {routes}
-            </StaticRouter>
-        </Provider>
-    );
-    const dehydratedState= store.getState();
-    return res.render('index', {
-        title: 'Sample React App',
-        PUBLIC_URL: '/',
-        assetManifest: assetManifest,
-        appHtml: appHtml,
-        dehydratedState: safeJSONstringify(dehydratedState)
-    });
+const renderPage = (req, res, assetManifest) => {
+    const context = {}
+    const store = configureStore()
+    const path= req.path;
+    console.log(path)
+    console.log('--------------------------------------------------------')
+    const pathInfo = pathInitData[path] || {};
+    const {stateKey, reducer, initState} = pathInfo;
+    const statePromise = (initState) ? initState() : Promise.resolve(null);
+    statePromise.then((result) => {
+        if (stateKey) {
+            const state = store.getState();
+            store.reset(combineReducers({
+                ...store._reducers,
+                [stateKey]: reducer
+            }), {
+                ...state,
+                [stateKey]: result
+            });
+        }
+        const appHtml = ReactDOMServer.renderToString(
+            <Provider store={store}>
+                <StaticRouter location={req.url} context={context}>
+                    {routes}
+                </StaticRouter>
+            </Provider>
+        );
+        const dehydratedState= store.getState();
+        if(context.url){
+            res.redirect(301, context.url);
+        }else {
+            return res.render('index', {
+                title: 'Sample React App',
+                PUBLIC_URL: '/',
+                assetManifest: assetManifest,
+                appHtml: appHtml,
+                dehydratedState: safeJSONstringify(dehydratedState)
+            });
+        }
+    })
 };
-
+module.exports = renderPage
