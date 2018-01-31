@@ -1105,6 +1105,6 @@ webpack-dev-middleware
 
  
 
-webpack-hot-middleware：
+webpack-hot-middleware:
 
 是一个结合webpack-dev-middleware使用的middleware，它可以实现浏览器的无刷新更新（hot reload），这也是webpack文档里常说的HMR（Hot Module Replacement）。HMR和热加载的区别是：热加载是刷新整个页面。

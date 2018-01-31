@@ -19,6 +19,7 @@ app.use(require('webpack-hot-middleware')(compiler, {
     path: '/__webpack_hmr',
     heartbeat: 10 * 1000
 }));
+app.use(express.static(path.resolve(__dirname, '../build')));
 app.get('*', function (req, res, next) {
     var filename = path.join(compiler.outputPath,'index.html');
     webpackDevMiddleware.waitUntilValid(() => {
